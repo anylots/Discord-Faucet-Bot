@@ -16,7 +16,6 @@ module.exports = async (keyv: Keyv, interaction: ChatInputCommandInteraction): P
 	// Initial Responce to client
 	await interaction.reply({ content: "🤖 Mining....", fetchReply: true });
 
-	console.log("ChatInputCommandInteraction");
 	try {
 		// Setup the log channel
 		const logchannel = interaction.client.channels.cache.get(channels.log) as TextChannel;

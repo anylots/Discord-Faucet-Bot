@@ -75,7 +75,6 @@ module.exports = async (
 		const contract = new ethers.Contract(address, erc20ABI, wallet);
 		// const decimals = await contract.decimals();
 
-		console.log("amount: " + amount);
 		// Create Transaction object
 		return (await contract.transfer(
 			usrAddress,

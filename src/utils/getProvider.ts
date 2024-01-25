@@ -13,11 +13,10 @@ module.exports = async (networkName: string): Promise<ethers.providers.JsonRpcPr
 	// Loop Over Every Network until the correct network is found
 	for (let i = 0; i < networks.length; i++) {
 		if (networks[i].name == networkName) {
-			networkRPC = networks[i].ALCHEMY_URL ?? networks[i].RPC_URL;
+			networkRPC = networks[i].RPC_URL;
 			break;
 		}
 	}
-	console.log("networkRPC: " + networkRPC);
 
 	if (!networkRPC) {
 		throw new Error("Network RPC Not Setup!");

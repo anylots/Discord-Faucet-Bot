@@ -49,7 +49,6 @@ InitializeDb();
 
 // Login to Bot with token
 try {
-	console.log(process.env.DB_USERNAME);
 	client.login(process.env.BOT_TOKEN);
 } catch (error) {
 	console.error(`Error login to BOT at index : ${error}`);

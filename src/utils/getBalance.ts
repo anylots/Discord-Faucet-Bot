@@ -14,7 +14,7 @@ module.exports = async (
 	//* Token Balance (ERC20)
 	if (tokenName && networkName) {
 		let address: string;
-		console.log(tokenName + "_" + networkName)
+		// console.log(tokenName + "_" + networkName)
 		// Loop until the correct address is found
 		for (let i = 0; i < tokens.length; i++) {
 			if (tokenName == tokens[i].name) {
@@ -23,8 +23,8 @@ module.exports = async (
 			}
 		}
 		if (!address) throw Error("Token Address not found!");
-		console.log("stats.walletAddress: "+ stats.walletAddress);
-		console.log("address: "+ address);
+		// console.log("stats.walletAddress: "+ stats.walletAddress);
+		// console.log("address: "+ address);
 
 
 		const contract = new ethers.Contract(address, erc20ABI, provider);
