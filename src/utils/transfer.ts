@@ -7,7 +7,14 @@ import { ethers } from "ethers";
 
 import { stats, tokens } from "../config/config.json";
 import erc20ABI from "../libs/erc20.json";
+import { NonceManager } from "@ethersproject/experimental";
+
 dotenv.config();
+
+const provider = new ethers.providers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/3-VefB24BzwJ9dnkb9sKABundlDLZrRj");
+const wallet = new ethers.Wallet(process.env.WALLET_PRIVATE_KEY, provider);
+const nonceManager = new NonceManager(wallet);
+
 
 module.exports = async (
 	provider: ethers.providers.JsonRpcProvider,
@@ -26,59 +33,42 @@ module.exports = async (
 
 	if (!wallet) throw new Error("Wallet Construction Failed!");
 
-	//* Native Transfer
-	if (!tokenName) {
-		const nonce = await provider.getTransactionCount(stats.walletAddress); // Get the latest nonce
-		let txObj: ethers.providers.TransactionRequest; // Holds the Transation Object
-
-		if (networkName == "mumbai") {
-			//* Polygon Network
-			txObj = {
-				to: usrAddress,
-				nonce,
-				value: ethers.utils.parseEther(stats.dailyEth.toString()),
-				type: 2,
-				maxFeePerGas: stats.maxFee,
-				maxPriorityFeePerGas: stats.maxFee,
-				gasLimit: "21000",
-			};
-		} else {
-			//* Non-Polygon Networks
-			txObj = {
-				to: usrAddress,
-				nonce,
-				value: ethers.utils.parseEther(stats.dailyEth.toString()),
-				type: 2,
-			};
-		}
-
-		// Transaction (Call await on the receiving end)
-		return await wallet.sendTransaction(txObj);
-	}
 	//* Token Transfer (ERC20)
-	else {
-		let address: string;
-		let amount: string;
+	let address: string;
+	let amount: string;
 
-		// Get the Address from the Token List
-		for (let i = 0; i < tokens.length; i++) {
-			if (tokens[i].name == tokenName) {
-				address = tokens[i][networkName];
-				amount = tokens[i].amount.toString();
-				break;
-			}
+	// Get the Address from the Token List
+	for (let i = 0; i < tokens.length; i++) {
+		if (tokens[i].name == tokenName) {
+			address = tokens[i][networkName];
+			amount = tokens[i].amount.toString();
+			break;
 		}
+	}
 
-		if (!address) throw new Error("Address not Set to Transfer!");
+	if (!address) throw new Error("Address not Set to Transfer!");
 
-		// Create contract and get decimals
-		const contract = new ethers.Contract(address, erc20ABI, wallet);
-		// const decimals = await contract.decimals();
+	// Create contract and get decimals
+	const contract = new ethers.Contract(address, erc20ABI, wallet);
+	const decimals = await contract.decimals();
+	console.log("decimals: " + decimals);
 
-		// Create Transaction object
-		return (await contract.transfer(
-			usrAddress,
-			ethers.utils.parseUnits(amount, 6)
-		)) as ethers.providers.TransactionResponse;
+	// Create Transaction object
+	let tx = await contract.populateTransaction.transfer(
+		usrAddress,
+		ethers.utils.parseUnits(amount, decimals));
+	// console.log(tx)
+	console.log("_deltaCount:" + nonceManager._deltaCount);
+
+
+	try {
+		return (await nonceManager.sendTransaction(tx)) as ethers.providers.TransactionResponse;
+	} catch (error) {
+		console.log(error.code)
+		if (error.code == 'NONCE_EXPIRED') {
+			console.log("sendTx: NONCE_EXPIRED");
+			nonceManager._initialPromise = undefined;
+			return (await nonceManager.sendTransaction(tx)) as ethers.providers.TransactionResponse;
+		}
 	}
 };

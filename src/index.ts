@@ -45,7 +45,7 @@ for (const file of commandFiles) {
 }
 
 // Database Connection
-InitializeDb();
+// InitializeDb();
 
 // Login to Bot with token
 try {

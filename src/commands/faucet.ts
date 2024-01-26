@@ -11,7 +11,7 @@ import { networks, tokens } from "../config/config.json";
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("faucet")
-		.setDescription("Claim daily ETH from the faucet")
+		.setDescription("Claim sepolia Token from the faucet")
 		.setDMPermission(false)
 		.setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
 		.addStringOption(option =>
@@ -20,29 +20,4 @@ module.exports = {
 				.setDescription("Paste in your wallet address")
 				.setRequired(true)
 		)
-		.addStringOption(option => {
-			option.setName("network").setDescription("Select the network").setRequired(true);
-
-			networks.forEach(network => {
-				option.addChoices({
-					name: `${network.name.toUpperCase()}`,
-					value: `${network.name.toLowerCase()}`,
-				});
-			});
-			return option;
-		})
-		.addStringOption(option => {
-			option
-				.setName("token")
-				.setDescription("Select the token if applicable")
-				.setRequired(false);
-
-			tokens.forEach(token => {
-				option.addChoices({
-					name: `${token.name.toUpperCase()}`,
-					value: `${token.name.toLowerCase()}`,
-				});
-			});
-			return option;
-		}),
 };

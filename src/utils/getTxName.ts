@@ -7,7 +7,7 @@ module.exports = (networkName: string): string => {
 
 	for (let i = 0; i < networks.length; i++) {
 		if (networkName == networks[i].name) {
-			url = networks[i].scan;
+			url = networks[i].scan_user;
 			break;
 		}
 	}

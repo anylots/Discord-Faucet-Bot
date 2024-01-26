@@ -28,7 +28,9 @@ module.exports = async (
 
 
 		const contract = new ethers.Contract(address, erc20ABI, provider);
-		return ethers.utils.formatUnits((await contract.balanceOf(stats.walletAddress)).toString(), 6);
+		const decimals = await contract.decimals();
+		console.log("balance_decimals: " + decimals);
+		return ethers.utils.formatUnits((await contract.balanceOf(stats.walletAddress)).toString(), decimals);
 	}
 
 	//* Native Balance
