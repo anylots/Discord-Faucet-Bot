@@ -15,6 +15,8 @@ import { channels, stats } from "../config/config.json";
 const handleRateLimiting = require("../utils/handleRateLimiting");
 
 module.exports = async (keyv: Keyv, interaction: CommandInteraction): Promise<void> => {
+	await interaction.reply({ content: "🤖 Mining....", fetchReply: true });
+
 	try {
 		// Rate Limiting for non Admins
 		const limit = (await handleRateLimiting(

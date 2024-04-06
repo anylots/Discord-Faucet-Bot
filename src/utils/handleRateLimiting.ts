@@ -18,8 +18,23 @@ module.exports = {
 		nonce = false,
 		keyv?: Keyv
 	): Promise<number | undefined> => {
+
+		console.log("interaction.user.id==" + interaction.user.id);
+		const bypassRolesArray = Array.isArray(bypassRoles) ? bypassRoles : [bypassRoles];
+		console.log(bypassRolesArray);
+
+		if (bypassRolesArray.includes(interaction.user.id as string)) {
+			console.log("interaction.user.id pass");
+			return undefined;
+		} else {
+			console.log("interaction.user.id does not pass");
+		}
+
+
+		// console.log(interaction.member.roles.cache);
 		//* Limited for non Admins
 		if (bypassRoles.some(role => !interaction.member.roles.cache.has(role))) {
+			console.log("=========>bypassRoles");
 			// KeyV Database Selected
 			if (stats.database.toLowerCase() == "keyv") {
 				const lastReqTime: number = nonce

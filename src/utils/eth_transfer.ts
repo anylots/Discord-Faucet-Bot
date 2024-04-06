@@ -5,8 +5,6 @@ import { CeloWallet } from "@celo-tools/celo-ethers-wrapper";
 import * as dotenv from "dotenv";
 import { ethers } from "ethers";
 
-import { stats, tokens } from "../config/config.json";
-import erc20ABI from "../libs/erc20.json";
 import { NonceManager } from "@ethersproject/experimental";
 
 dotenv.config();
@@ -20,7 +18,6 @@ module.exports = async (
 	provider: ethers.providers.JsonRpcProvider,
 	usrAddress: string,
 	networkName: string,
-	tokenName?: any
 ): Promise<ethers.providers.TransactionResponse> => {
 	// Create a wallet instance
 	let wallet: ethers.Wallet;
@@ -33,41 +30,11 @@ module.exports = async (
 
 	if (!wallet) throw new Error("Wallet Construction Failed!");
 
-	let tx: ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
-	if (tokenName == "ETH") {
-		tx = await wallet.populateTransaction({
-			to: usrAddress,
-			value: ethers.utils.parseEther("0.0005")
-		});
-	} else {
-		//* Token Transfer (ERC20)
-		let address: string;
-		let amount: string;
+	let tx = await wallet.populateTransaction({
+		to: usrAddress,
+		value: ethers.utils.parseEther("0.05")
+	});
 
-		// Get the Address from the Token List
-		for (let i = 0; i < tokens.length; i++) {
-			if (tokens[i].name == tokenName) {
-				address = tokens[i][networkName];
-				amount = tokens[i].amount.toString();
-				break;
-			}
-		}
-
-		if (!address) throw new Error("Address not Set to Transfer!");
-
-		// Create contract and get decimals
-		const contract = new ethers.Contract(address, erc20ABI, wallet);
-		const decimals = await contract.decimals();
-		console.log("decimals: " + decimals);
-
-		// Create Transaction object
-		tx = await contract.populateTransaction.transfer(
-			usrAddress,
-			ethers.utils.parseUnits(amount, decimals));
-	}
-
-	// console.log(tx)
-	console.log("_deltaCount:" + nonceManager._deltaCount);
 
 
 	try {

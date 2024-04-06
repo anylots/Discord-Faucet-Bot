@@ -28,6 +28,9 @@ module.exports = {
 					require("../responses/balance_response")(interaction);
 				} else if (interaction.commandName === "faucet") {
 					require("../responses/faucet_response")(keyv, interaction);
+				} else if (interaction.commandName === "faucet_eth") {
+					console.log("interaction.commandName === faucet_eth")
+					require("../responses/faucet_response")(keyv, interaction);
 				}
 				// Invalid Chat command passed
 				else {
@@ -38,8 +41,7 @@ module.exports = {
 					errorchannel.send(
 						`[ERROR]\n${new Date(
 							Date.now()
-						).toUTCString()}\nInvalid Chat Command Passed\nBy : ${
-							interaction.user.username
+						).toUTCString()}\nInvalid Chat Command Passed\nBy : ${interaction.user.username
 						}`
 					);
 					return;
@@ -79,8 +81,7 @@ module.exports = {
 					errorchannel.send(
 						`[ERROR]\n${new Date(
 							Date.now()
-						).toUTCString()}\nInvalid Modal Interaction\nBy : ${
-							interaction.user.username
+						).toUTCString()}\nInvalid Modal Interaction\nBy : ${interaction.user.username
 						}`
 					);
 					return;

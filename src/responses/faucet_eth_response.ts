@@ -4,9 +4,8 @@ import { ChatInputCommandInteraction, EmbedBuilder, TextChannel } from "discord.
 import { ethers } from "ethers";
 import Keyv from "keyv";
 
-import { channels, stats, tokens } from "../config/config.json";
+import { channels, stats } from "../config/config.json";
 
-const getBalance = require("../utils/getBalance");
 const getProvider = require("../utils/getProvider");
 const getTxName = require("../utils/getTxName");
 const { getTimer, setTimer } = require("../utils/handleRateLimiting");
@@ -14,9 +13,10 @@ const transfer = require("../utils/transfer");
 
 const networkName = "sepolia";
 
-module.exports = async (keyv: Keyv, interaction: ChatInputCommandInteraction): Promise<void> => {
+module.exports = async (keyv: Keyv,interaction: ChatInputCommandInteraction): Promise<void> => {
 	// Initial Responce to client
-	await interaction.reply({ content: "🤖 Mining....", fetchReply: true });
+	await interaction.reply({ content: "👩‍💻 Calculating....", fetchReply: true });
+
 
 	try {
 		// Setup the log channel
@@ -36,6 +36,8 @@ module.exports = async (keyv: Keyv, interaction: ChatInputCommandInteraction): P
 
 		// Get the Provider based on the network
 		const provider = (await getProvider(networkName)) as ethers.providers.JsonRpcProvider;
+
+		await getTimer(interaction, networkName, false, keyv);
 
 		// If there is no contract address for that token
 		// let address: string;
@@ -91,37 +93,23 @@ module.exports = async (keyv: Keyv, interaction: ChatInputCommandInteraction): P
 		// 	await setTimer(interaction, networkName, true, keyv);
 		// }
 
-		// Transaction
-		if (interaction.isChatInputCommand() && interaction.commandName === "faucet_eth") {
-			const tx = (await transfer(
-				provider,
-				usrAddress,
-				networkName,
-				"ETH"
-			)) as ethers.providers.TransactionResponse;
-			await tx.wait();
-		} else {
-			for (let i = 0; i < tokens.length; i++) {
-				let tokenName = tokens[i].name
-				const tx = (await transfer(
-					provider,
-					usrAddress,
-					networkName,
-					tokenName
-				)) as ethers.providers.TransactionResponse;
-				await tx.wait();
-			}
-		}
+		const tx = (await transfer(
+			provider,
+			usrAddress,
+			networkName,
+			"ETH"
+		)) as ethers.providers.TransactionResponse;
+		await tx.wait();
 		await setTimer(interaction, networkName, false, keyv);
 
-		// const string = await getTxName(networkName);
-		// const embed = new EmbedBuilder()
-		// 	.setColor("#3BA55C")
-		// 	.setDescription(`[View Transaction](${string}${usrAddress}#tokentxns)`);
-		// await interaction.editReply({
-		// 	content: `👨‍🏭 Working Hard, please wait...`,
-		// 	embeds: [embed],
-		// });
+		const string = await getTxName(networkName);
+		const embed = new EmbedBuilder()
+			.setColor("#3BA55C")
+			.setDescription(`[View Transaction](${string}${usrAddress}#tokentxns)`);
+		await interaction.editReply({
+			content: `👨‍🏭 Working Hard, please wait...`,
+			embeds: [embed],
+		});
 
 
 		// Transfer Success
